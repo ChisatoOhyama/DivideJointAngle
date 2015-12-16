@@ -1,0 +1,195 @@
+// -*- C++ -*-
+/*!
+ * @file  DivideJointAngle.cpp
+ * @brief ModuleDescription
+ * @date $Date$
+ *
+ * $Id$
+ */
+
+#include "DivideJointAngle.h"
+
+// Module specification
+// <rtc-template block="module_spec">
+static const char* dividejointangle_spec[] =
+  {
+    "implementation_id", "DivideJointAngle",
+    "type_name",         "DivideJointAngle",
+    "description",       "ModuleDescription",
+    "version",           "1.0.0",
+    "vendor",            "pretty",
+    "category",          "Category",
+    "activity_type",     "PERIODIC",
+    "kind",              "DataFlowComponent",
+    "max_instance",      "1",
+    "language",          "C++",
+    "lang_type",         "compile",
+    ""
+  };
+// </rtc-template>
+
+/*!
+ * @brief constructor
+ * @param manager Maneger Object
+ */
+DivideJointAngle::DivideJointAngle(RTC::Manager* manager)
+    // <rtc-template block="initializer">
+  : RTC::DataFlowComponentBase(manager),
+    m_currentJointAngle_AllIn("currentJointAngle_All", m_currentJointAngle_All),
+    m_currentJointAngle_HeadOut("currentJointAngle_Head", m_currentJointAngle_Head),
+    m_currentJointAngle_LArmOut("currentJointAngle_LArm", m_currentJointAngle_LArm),
+    m_currentJointAngle_RArmOut("currentJointAngle_RArm", m_currentJointAngle_RArm),
+    m_currentJointAngle_LegOut("currentJointAngle_Leg", m_currentJointAngle_Leg)
+
+    // </rtc-template>
+{
+}
+
+/*!
+ * @brief destructor
+ */
+DivideJointAngle::~DivideJointAngle()
+{
+}
+
+
+
+RTC::ReturnCode_t DivideJointAngle::onInitialize()
+{
+  // Registration: InPort/OutPort/Service
+  // <rtc-template block="registration">
+  // Set InPort buffers
+  addInPort("currentJointAngle_All", m_currentJointAngle_AllIn);
+  
+  // Set OutPort buffer
+  addOutPort("currentJointAngle_Head", m_currentJointAngle_HeadOut);
+  addOutPort("currentJointAngle_LArm", m_currentJointAngle_LArmOut);
+  addOutPort("currentJointAngle_RArm", m_currentJointAngle_RArmOut);
+  addOutPort("currentJointAngle_Leg", m_currentJointAngle_LegOut);
+  
+  // Set service provider to Ports
+  
+  // Set service consumers to Ports
+  
+  // Set CORBA Service Ports
+  
+  // </rtc-template>
+
+  // <rtc-template block="bind_config">
+  // </rtc-template>
+  
+  return RTC::RTC_OK;
+}
+
+/*
+RTC::ReturnCode_t DivideJointAngle::onFinalize()
+{
+  return RTC::RTC_OK;
+}
+*/
+
+/*
+RTC::ReturnCode_t DivideJointAngle::onStartup(RTC::UniqueId ec_id)
+{
+  return RTC::RTC_OK;
+}
+*/
+
+/*
+RTC::ReturnCode_t DivideJointAngle::onShutdown(RTC::UniqueId ec_id)
+{
+  return RTC::RTC_OK;
+}
+*/
+
+
+RTC::ReturnCode_t DivideJointAngle::onActivated(RTC::UniqueId ec_id)
+{
+  return RTC::RTC_OK;
+}
+
+
+RTC::ReturnCode_t DivideJointAngle::onDeactivated(RTC::UniqueId ec_id)
+{
+  return RTC::RTC_OK;
+}
+
+
+RTC::ReturnCode_t DivideJointAngle::onExecute(RTC::UniqueId ec_id)
+{
+	if (m_currentJointAngle_AllIn.isNew()){
+		m_currentJointAngle_AllIn.read();
+
+		//HeadYaw, HeadPitch, LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand, HipRoll, HipPitch, KneePitch, RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand
+		m_currentJointAngle_Head.data[0] = m_currentJointAngle_All.data[0]; //HeadYaw
+		m_currentJointAngle_Head.data[1] = m_currentJointAngle_All.data[1]; //HeadPitch
+
+		for (int i = 0; i++; i < 6){
+			m_currentJointAngle_LArm.data[i] = m_currentJointAngle_All.data[i + 2];
+			m_currentJointAngle_RArm.data[i] = m_currentJointAngle_All.data[i + 11];
+		}
+
+		m_currentJointAngle_Leg.data[0] = m_currentJointAngle_All.data[3]; //HipRoll
+		m_currentJointAngle_Leg.data[1] = m_currentJointAngle_All.data[4]; //HipPitch
+		m_currentJointAngle_Leg.data[2] = m_currentJointAngle_All.data[5]; //KneePitch
+
+		m_currentJointAngle_HeadOut.write();
+		m_currentJointAngle_LArmOut.write();
+		m_currentJointAngle_RArmOut.write();
+		m_currentJointAngle_LegOut.write();
+
+	}
+  return RTC::RTC_OK;
+}
+
+/*
+RTC::ReturnCode_t DivideJointAngle::onAborting(RTC::UniqueId ec_id)
+{
+  return RTC::RTC_OK;
+}
+*/
+
+/*
+RTC::ReturnCode_t DivideJointAngle::onError(RTC::UniqueId ec_id)
+{
+  return RTC::RTC_OK;
+}
+*/
+
+/*
+RTC::ReturnCode_t DivideJointAngle::onReset(RTC::UniqueId ec_id)
+{
+  return RTC::RTC_OK;
+}
+*/
+
+/*
+RTC::ReturnCode_t DivideJointAngle::onStateUpdate(RTC::UniqueId ec_id)
+{
+  return RTC::RTC_OK;
+}
+*/
+
+/*
+RTC::ReturnCode_t DivideJointAngle::onRateChanged(RTC::UniqueId ec_id)
+{
+  return RTC::RTC_OK;
+}
+*/
+
+
+
+extern "C"
+{
+ 
+  void DivideJointAngleInit(RTC::Manager* manager)
+  {
+    coil::Properties profile(dividejointangle_spec);
+    manager->registerFactory(profile,
+                             RTC::Create<DivideJointAngle>,
+                             RTC::Delete<DivideJointAngle>);
+  }
+  
+};
+
+
